@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Analyzer </title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-dark: hsla(251, 15.7%, 7.7%, 0.88);
+            --ui-card-bg: hsla(251, 15.7%, 7.7%, 0.88);
+            --inner-card-bg: rgba(255, 255, 255, 0.03);
+            
+            --text-main: #FFFFFF;
+            --text-sub: rgba(255, 255, 255, 0.7);
+
+            --material-silver-gradient: linear-gradient(135deg, #E0E0E0 0%, #F5F5F5 50%, #9E9E9E 100%);
+            --material-silver-border: rgba(220, 220, 220, 0.6);
+
+            --accent-cyan: #00f2fe;
+            --danger-color: #ff4b72;
+            --success-color: #00e676;
+            --warning-color: #ffb703;
+            --border-radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: hsla(251, 15.7%, 7.7%, 0.88);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 35px 15px 20px 15px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--ui-card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 22px 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .avatar-trigger {
+            cursor: pointer;
+            border-radius: 50%;
+            padding: 2px;
+            background: var(--material-silver-gradient);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-trigger:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            border: 2px solid hsla(251, 15.7%, 7.7%, 1);
+        }
+
+        .brand-text {
+            text-align: left;
+        }
+
+        .brand-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #FFFFFF !important;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .selector-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .segmented-control {
+            display: flex;
+            position: relative;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            padding: 4px;
+        }
+
+        .segmented-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-sub);
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 9px 0;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .segmented-btn .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-sub);
+        }
+
+        .segmented-btn.active {
+            color: #000000;
+        }
+
+        .segmented-btn.active .dot {
+            background: #000000;
+            box-shadow: none;
+        }
+
+        .segmented-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: var(--material-silver-gradient);
+            border: 1px solid var(--material-silver-border);
+            border-radius: 36px;
+            transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 1;
+            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+        }
+
+        .segmented-control.real-selected .segmented-slider {
+            transform: translateX(100%);
+        }
+
+        main {
+            position: relative;
+            width: 100%;
+        }
+
+        .upload-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 35px 20px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            /* Filter and Shadow Removal from Upload Card */
+            filter: none !important;
+            box-shadow: none !important;
+        }
+
+        .upload-card:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .upload-file-input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer; z-index: 5;
+        }
+
+        .upload-icon-wrapper {
+            width: 58px;
+            height: 58px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .upload-icon-wrapper svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: #FFFFFF;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .upload-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            letter-spacing: 0.3px;
+        }
+
+        .upload-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-sub);
+        }
+
+        .master-results-box {
+            display: none;
+            background: var(--ui-card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--border-radius);
+            padding: 18px;
+            flex-direction: column;
+            gap: 14px;
+            animation: fadeIn 0.35s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .box-header {
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #FFFFFF;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .inner-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .inner-card {
+            background: var(--inner-card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .inner-card.full-width {
+            grid-column: span 2;
+        }
+
+        .inner-card label {
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .inner-card .value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+        }
+
+        .trap-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .trap-badge-level {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            width: fit-content;
+            background: rgba(255, 183, 3, 0.15);
+            color: var(--warning-color);
+            border: 1px solid rgba(255, 183, 3, 0.3);
+        }
+
+        .trap-reason {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #FFFFFF;
+            line-height: 1.4;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 10px;
+            border-radius: 8px;
+            border-left: 3px solid var(--warning-color);
+        }
+
+        .reanalyze-btn {
+            width: 100%;
+            background: var(--material-silver-gradient);
+            color: #000000;
+            border: 1px solid var(--material-silver-border);
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            margin-top: 4px;
+        }
+
+        .reanalyze-btn:hover {
+            opacity: 0.9;
+        }
+
+        .currency-flags {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 6px;
+        }
+
+        .flag-img {
+            width: 18px;
+            height: 13px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+
+        .loader-wrapper {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            border-top: 3px solid #FFFFFF;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-wrapper p {
+            font-size: 0.8rem;
+            color: #FFFFFF;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(4, 6, 14, 0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1; pointer-events: all;
+        }
+
+        .modal-box {
+            background: var(--ui-card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 22px;
+            padding: 22px;
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .modal-head h3 {
+            font-size: 1rem;
+            color: #FFFFFF;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #FFFFFF;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        .input-with-eye {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-with-eye input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px 40px 10px 10px;
+            color: #FFFFFF;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .eye-toggle-btn {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.2s ease;
+        }
+
+        .eye-toggle-btn:hover {
+            color: #FFFFFF;
+        }
+
+        .eye-toggle-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .premium-btn {
+            background: var(--material-silver-gradient);
+            color: #000000;
+            border: none;
+            border-radius: 10px;
+            padding: 11px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            cursor: pointer;
+        }
+
+        .contact-single-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-top: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .contact-single-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .contact-single-btn .telegram-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #24A1DE;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(36, 161, 222, 0.4);
+            flex-shrink: 0;
+        }
+
+        .contact-single-btn .telegram-badge svg {
+            width: 15px;
+            height: 15px;
+            fill: #FFFFFF;
+        }
+
+        .contact-single-btn .contact-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .disclaimer-body {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.5;
+            background: rgba(255, 75, 114, 0.08);
+            border: 1px solid rgba(255, 75, 114, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            color: var(--text-sub);
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            background: transparent;
+        }
+
+        .checkbox-container input:checked {
+            border-color: #FFFFFF;
+            background: #FFFFFF;
+        }
+
+        .checkbox-container input:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background-color: #000000;
+            border-radius: 50%;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(15, 22, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #FFFFFF;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="brand-section">
+                <div class="avatar-trigger" id="avatarTrigger" title="Settings & Contact">
+                    <img src="https://i.postimg.cc/RZ8hXHZZ/nlxsh.png" alt="User Avatar" class="avatar-img">
+                </div>
+                <div class="brand-text">
+                    <h1>Market Analyzer</h1>
+                    <p>Smarter Analysis • Better Decisions</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="selector-wrapper">
+            <div class="segmented-control" id="modeSwitch">
+                <div class="segmented-slider"></div>
+                <button class="segmented-btn active" id="btnOtc" type="button">
+                    <span class="dot"></span> OTC
+                </button>
+                <button class="segmented-btn" id="btnReal" type="button">
+                    <span class="dot"></span> Real
+                </button>
+            </div>
+        </div>
+
+        <main>
+            <div class="upload-card" id="uploadArea">
+                <input type="file" class="upload-file-input" id="chartFileInput" accept="image/*">
+                <div class="upload-icon-wrapper">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                </div>
+                <div class="upload-title" id="uploadTitleText">Upload OTC Chart</div>
+                <div class="upload-subtitle">Drop your chart screenshot here or tap to browse</div>
+            </div>
+
+            <div class="loader-wrapper" id="loader">
+                <div class="spinner"></div>
+                <p>Analyzing price structure & trap levels...</p>
+            </div>
+
+            <div class="master-results-box" id="masterResultsBox">
+                <div class="box-header">
+                    <span>Market Analysis Result</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                </div>
+                <div class="inner-cards-grid">
+                    <div class="inner-card">
+                        <label>Pair / Asset</label>
+                        <div class="value" id="val-pair">--</div>
+                    </div>
+                    <div class="inner-card">
+                        <label>Signal Action</label>
+                        <div class="value" id="val-signal">--</div>
+                    </div>
+                    <div class="inner-card">
+                        <label>Market Trend</label>
+                        <div class="value" id="val-trend">--</div>
+                    </div>
+                    <div class="inner-card">
+                        <label>Confidence</label>
+                        <div class="value" id="val-confidence">--</div>
+                    </div>
+
+                    <div class="inner-card full-width">
+                        <label>Trap Detected</label>
+                        <div class="trap-card-content">
+                            <div class="trap-badge-level">
+                                <span>Level:</span>
+                                <span id="trap-level-text">Medium</span>
+                            </div>
+                            <div class="trap-reason">
+                                <strong>Reason:</strong> <span id="trap-reason-text">Dead cat bounce against a strong downward trend.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inner-card full-width">
+                        <label>Signal Logic</label>
+                        <div class="value" id="val-logic" style="font-size: 0.82rem; font-weight: 500; line-height: 1.4;">--</div>
+                    </div>
+                </div>
+
+                <button class="reanalyze-btn" id="reanalyzeBtn" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6"></path>
+                        <path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    Analyze another chart
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Settings & Support</h3>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label for="apiKeyInput">ChatAnywhere API Key</label>
+                <div class="input-with-eye">
+                    <input type="password" id="apiKeyInput" placeholder="Enter API Key...">
+                    <button type="button" class="eye-toggle-btn" id="togglePasswordBtn" title="Show/Hide API Key">
+                        <svg id="eyeIcon" viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button class="premium-btn" id="saveKeyBtn">Save Settings</button>
+
+            <a href="https://t.me/nlxsh99" target="_blank" class="contact-single-btn">
+                <div class="telegram-badge">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                    </svg>
+                </div>
+                <span class="contact-text">Contact</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="disclaimerModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3 style="color: var(--warning-color); display: flex; align-items: center; gap: 6px;">
+                    ⚠️ Risk Disclaimer
+                </h3>
+            </div>
+            
+            <div class="disclaimer-body">
+                Trading is a high-risk platform. Please consider carefully before depositing. Otherwise, our app will not be held responsible for any financial losses incurred while using this app.<br><br>
+                <strong>Thank you.</strong>
+            </div>
+
+            <label class="checkbox-container">
+                <input type="checkbox" id="dontShowAgainCheck">
+                <span>Don't show this again</span>
+            </label>
+
+            <button class="premium-btn" id="acceptDisclaimerBtn">I Understand & Accept</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toastMsg">Notification</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const avatarTrigger = document.getElementById('avatarTrigger');
+            const settingsModal = document.getElementById('settingsModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const saveKeyBtn = document.getElementById('saveKeyBtn');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            const disclaimerModal = document.getElementById('disclaimerModal');
+            const dontShowAgainCheck = document.getElementById('dontShowAgainCheck');
+            const acceptDisclaimerBtn = document.getElementById('acceptDisclaimerBtn');
+
+            const modeSwitch = document.getElementById('modeSwitch');
+            const btnOtc = document.getElementById('btnOtc');
+            const btnReal = document.getElementById('btnReal');
+
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadTitleText = document.getElementById('uploadTitleText');
+            const chartFileInput = document.getElementById('chartFileInput');
+            const loader = document.getElementById('loader');
+            const masterResultsBox = document.getElementById('masterResultsBox');
+            const reanalyzeBtn = document.getElementById('reanalyzeBtn');
+
+            const valPair = document.getElementById('val-pair');
+            const valSignal = document.getElementById('val-signal');
+            const valTrend = document.getElementById('val-trend');
+            const valConfidence = document.getElementById('val-confidence');
+            const trapLevelText = document.getElementById('trap-level-text');
+            const trapReasonText = document.getElementById('trap-reason-text');
+            const valLogic = document.getElementById('val-logic');
+
+            let isOtcMode = true;
+
+            const OTC_PROMPT = `You are an Elite M1 OTC/Synthetic Chart Analyst — assumption-free, evidence-first, multi-candle, completed-candle-priority, context-driven, entry-focused; objectively evaluate UP and DOWN, then select the strongest evidence-supported direction ONLY when a defensible entry setup is actually present.
+
+CRITICAL ENTRY TIMING & FLEXIBLE ENTRY
+- The screenshot is normally captured between 30 and 55 seconds before a potential entry.
+- The screenshot is analyzed during [Current Minute]:05–:59.
+- The current forming candle is NEVER treated as a completed confirmation candle.
+- The next candle is NOT automatically the target.
+- Do NOT force a signal simply because the next minute is approaching.
+- First determine whether the visible chart contains a valid, actionable setup.
+- Identify the most defensible entry timing from chart structure rather than always using [Next Minute]:00.
+- Entry may occur at the opening, middle, or later portion of a suitable candle ONLY when the required confirmation and structure are present.
+- If the setup requires waiting for a specific price area, rejection, breakout confirmation, continuation confirmation, or retest, identify that condition instead of forcing an immediate entry.
+- The running candle may provide developing information, but it must NOT be treated as confirmed evidence until its behaviour is sufficiently established.
+- Never react mechanically to the latest visible candle.
+- Never assume that the next candle must be traded.
+- Never invent a future exact price or future candle behaviour.
+
+1. MARKET MODE
+- Treat the instrument strictly as a broker-generated OTC/synthetic price series.
+- Do not apply assumptions from the corresponding real-world market.
+- Base conclusions only on observable chart behaviour.
+
+2. MARKET PATTERN & STRUCTURE
+- Use all visible candles to understand the broader context, while giving the previous 4–7 fully completed candles primary weight for recent structure.
+- Mandatory: determine whether the recent 4–7 candle sequence follows a recognizable logic, rhythm, structure, or evolving pattern, even when candle directions are mixed.
+- Distinguish coherent, repeatable behaviour from genuinely erratic or incoherent movement.
+- Identify the active behaviour pattern/regime only when supported by repeated multi-candle evidence.
+- Treat the identified regime as a working hypothesis, not a certainty, and validate it against the broader visible structure.
+- Do not treat a single candle as sufficient evidence for an entry.
+
+3. ANTI-LAST-CANDLE
+- Never choose a direction solely from the newest completed candle.
+- A single spike, engulfing body, wick, large body, or colour change is insufficient by itself.
+- Interpret the latest completed candle only in relation to the preceding structure and active regime.
+- Do not assign directional weight until its behaviour is supported or clarified by surrounding evidence.
+
+4. OTC BEHAVIOUR REGIME
+- Consider directional continuation, range/mean reversion, repeated rejection, false-break/trap behaviour, breakout acceptance, momentum burst/exhaustion, alternating chop, short-cycle rhythm, wick-heavy sweeps, and abnormal volatility.
+- These are hypotheses only; select the regime best supported by repeated evidence.
+- Never label exhaustion, reversal, breakout, sweep, trap, or manipulation from an isolated event.
+- Let the validated regime influence the interpretation of all other evidence rather than acting as an automatic signal.
+
+5. LEVELS & TRAPS
+- Use only visibly established support/resistance confirmed by multiple reactions and read price values directly from the scale.
+- Never invent unseen order blocks, fair value gaps, broker levels, hidden liquidity, or other invisible structures.
+- Never classify the current price area as support or resistance unless it is visibly established by multiple prior reactions.
+- Evaluate levels and traps in the context of the identified regime and broader visible structure.
+- Rate trap behaviour HIGH only when repeated false breaks, sweeps, or deceptive rejections are clearly supported by multiple candles.
+
+6. ENTRY SETUP VALIDATION
+- Before producing a trade signal, determine whether an actual entry setup exists.
+- A valid setup should have multiple independent confirmations such as:
+  - Clear directional structure or clearly validated mean-reversion structure.
+  - Price interacting with a visibly established support/resistance area or another observable structural area.
+  - Multi-candle confirmation rather than one-candle prediction.
+  - Consistent body/wick behaviour.
+  - Directional pressure supported by surrounding candles.
+  - Validated continuation, rejection, breakout acceptance, retest, or reversal structure.
+  - No immediate conflicting evidence from nearby structure.
+  - Entry location is not excessively extended after a large move.
+  - The expected entry has a reasonable structural reason for occurring NOW rather than merely because the next candle is starting.
+- Do NOT signal when the direction appears correct but the current price is at a poor entry location.
+
+7. ENTRY TRIGGER
+- Determine the specific observable condition that makes the trade actionable.
+- Possible triggers include confirmed rejection from established support/resistance, confirmed breakout followed by acceptance, confirmed retest after breakout, confirmed continuation after structural pullback, confirmed reversal after repeated rejection/sweep sequence, or confirmed momentum continuation when surrounding candles support the move.
+- The trigger must be supported by multiple pieces of evidence.
+- Do NOT treat one large candle, one wick, one engulfing candle, one colour change, one spike, one apparent breakout without confirmation, or a prediction that the next candle should continue as an entry trigger.
+
+8. NO-TRADE / INVALID ENTRY ZONE
+- Explicitly identify when the current price/candle should NOT be traded.
+- Do NOT take a trade when:
+  - Price is moving inside unclear or highly compressed chop without a validated edge.
+  - UP and DOWN evidence are materially balanced.
+  - Price is located between established support and resistance with no clear reaction.
+  - A breakout has occurred but acceptance is not confirmed.
+  - A candle has already made an unusually extended move and entry would be chasing.
+  - A suspected reversal has no multi-candle confirmation.
+  - The current candle is producing conflicting or unstable behaviour.
+  - The structure is too noisy to identify a defensible entry location.
+  - The setup depends primarily on prediction rather than observable confirmation.
+  - The proposed entry is too close to a strong opposing level.
+  - The expected structural space is too small because the next meaningful opposing level is too close.
+  - The chart does not provide enough evidence to justify a specific entry.
+- When the price enters a no-trade zone, do NOT force UP or DOWN.
+
+9. ENTRY QUALITY
+- Classify the setup internally as:
+  NOT_READY — directional idea may exist, but entry confirmation is missing.
+  VALID_ENTRY — structure and trigger are sufficiently aligned.
+  STRONG_ENTRY — multiple independent confirmations align with clear structural space.
+  INVALID_ENTRY — current price/candle should not be traded.
+- Only output UP or DOWN when the entry is VALID_ENTRY or STRONG_ENTRY.
+- If the directional bias exists but the entry is not yet confirmed, return WAIT and clearly explain what confirmation is required.
+
+10. DECISION PROCESS
+- Analyze the entire visible chart before deciding.
+- Use the previous 4–7 completed candles as the primary recent-structure window.
+- Evaluate broader visible context before selecting an entry.
+- Evaluate CALL/UP and PUT/DOWN independently using multiple non-redundant pieces of evidence.
+- Determine the current market regime.
+- Determine important established levels.
+- Determine whether price is approaching, reacting to, breaking, retesting, or moving away from an important level.
+- Determine whether the current location is tradable or a no-trade zone.
+- Determine the strongest direction only after validating the entry location.
+- Determine the actual entry timing/condition instead of automatically selecting the next candle.
+- Prefer a slightly later confirmed entry over an earlier speculative entry.
+- Do NOT force a signal simply to avoid WAIT.
+- WAIT is appropriate when a directional idea exists but the current entry is not yet validated.
+- WAIT is also appropriate when the overall structure is genuinely high-risk, unresolved, or materially contradictory.
+- Normal small uncertainty alone must not trigger WAIT if a clear valid entry setup exists.
+
+11. ENTRY TIMING RULE
+- The system must determine where and when the trade is actually actionable.
+- Do not assume ENTRY = [Next Minute]:00.
+- ENTRY = the earliest clearly validated point where the required structural trigger is confirmed.
+- If no such point is currently visible, return WAIT.
+- The system must never invent a future exact price or future candle behaviour.
+
+12. CONFIDENCE
+- Confidence must reflect evidence quality and entry quality, not visual drama:
+  60–70 = limited/mixed evidence or developing setup.
+  71–85 = solid multi-candle agreement and acceptable entry structure.
+  86–99 = strong multi-factor confluence with clear entry location and trigger.
+- Do not use high confidence merely because the latest candle is large.
+
+OUTPUT CONTRACT
+Return ONLY one valid JSON object.
+No markdown, code fences, headings, comments, or text outside JSON.
+Do not add extra keys.
+
+Required JSON schema:
+{
+  "valid_chart": true,
+  "edited_chart": false,
+  "pair": "DETECTED_PAIR_WITHOUT_OTC_SUFFIX",
+  "direction": "UP or DOWN or WAIT",
+  "strength": "Very Weak or Weak or Medium or Strong or Very Strong",
+  "trend": "Bullish or Bearish or Sideways or Volatile",
+  "support": 0.0,
+  "resistance": 0.0,
+  "trap_level": "Low or Medium or High",
+  "traps": ["short trap description"],
+  "logic": "Concise evidence-based reasoning including why the current entry is valid or why the current price/candle must NOT be traded"
+}
+
+For every invalid/untrusted image return exactly:
+{
+  "valid_chart": false,
+  "edited_chart": true,
+  "pair": null,
+  "direction": null,
+  "strength": null,
+  "trend": null,
+  "support": null,
+  "resistance": null,
+  "trap_level": null,
+  "traps": null,
+  "logic": null
+}`;
+
+            const REAL_PROMPT = `You are an elite institutional price-action trader reading a live 1-minute market chart screenshot (forex, crypto, or index — not an OTC broker feed), covering roughly the last 20-30 visible candles. Ignore lagging indicators entirely — base your read purely on raw price action, market microstructure, liquidity, and candlestick psychology.
+
+Work through this analysis before answering:
+1) Market microstructure — identify the immediate trend: higher highs/higher lows (uptrend), lower highs/lower lows (downtrend), or ranging. Look for a Break of Structure (BOS) or Change of Character (CHoCH) in the visible candles.
+2) Liquidity & traps — scan for a liquidity grab: a wick sweeping above a prior high or below a prior low that immediately rejects, signalling retail traders got trapped and a reversal is likely.
+3) Buyer/seller psychology — read the last 3-5 candle bodies and wicks for exhaustion (shrinking bodies, lengthening wicks into a level) or a momentum anomaly (an outsized candle out of nowhere that usually pulls back).
+4) Order blocks & zones — find the freshest unmitigated order block (the last opposite candle before a strong move) or an extreme supply/demand zone; disregard weak, mid-range levels.
+5) Execution logic — only assign confidence above 85 when there's real confluence (price at a zone/order block AND a rejection wick AND alignment with the micro-trend). If the chart is chopping in the middle of a range with no clear narrative, keep confidence low (60-70) instead of forcing a strong read.
+
+Identify the traded asset from the chart if visible (e.g., EUR/USD), otherwise use "Unknown". Based on the above, predict the most likely direction for the next 1-minute candle.
+
+Also check whether the chart is actually an OTC/synthetic broker feed rather than a real live market. Two signals, in priority order:
+1) An opening parenthesis "(" printed right after the asset name/pair label (e.g., "USD/IDR (OTC)") — the bracket alone is enough evidence, even if the rest is cut off by UI chrome (e.g. a dropdown arrow truncating it to "USD/IDR (O..." or just "USD/IDR ("). A real market pair label never has an opening bracket next to it at all.
+2) If the pair label is fully hidden, fall back to the payout percentage shown near the trade panel: OTC pairs consistently quote very high payouts (roughly 90%+), while real market pairs run lower and more variable (commonly 60-85%). Treat this only as a fallback, not a primary signal, when the label itself gives no evidence either way.
+The broker being Quotex, Pocket Option, Binolla, etc. is NOT by itself evidence of OTC — these brokers offer both real and OTC pairs, and most of their screenshots (including normal market hours trading) are real pairs with no bracket next to the label. Set "isOtc" to true only when signal 1 or 2 above actually supports it; otherwise false.
+
+Output ONLY a valid JSON object with this exact structure: {"market": "Asset Name", "direction": "CALL" or "PUT", "confidence": integer between 60 and 95, "logics": ["Reason 1 (trend/microstructure)", "Reason 2 (the liquidity sweep or order block driving this)", "Reason 3 (biggest risk to this setup)"], "isOtc": true or false}. Do not add any conversational text or markdown formatting.`;
+
+            uploadTitleText.textContent = isOtcMode ? "Upload OTC Chart" : "Upload Real Market Chart";
+
+            const hideDisclaimer = localStorage.getItem('hideRiskDisclaimer');
+            if (!hideDisclaimer) {
+                disclaimerModal.classList.add('active');
+            }
+
+            acceptDisclaimerBtn.addEventListener('click', () => {
+                if (dontShowAgainCheck.checked) {
+                    localStorage.setItem('hideRiskDisclaimer', 'true');
+                }
+                disclaimerModal.classList.remove('active');
+            });
+
+            apiKeyInput.value = localStorage.getItem('chatAnywhereApiKey') || localStorage.getItem('geminiApiKey') || '';
+
+            togglePasswordBtn.addEventListener('click', () => {
+                if (apiKeyInput.type === 'password') {
+                    apiKeyInput.type = 'text';
+                    eyeIcon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+                } else {
+                    apiKeyInput.type = 'password';
+                    eyeIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+                }
+            });
+
+            avatarTrigger.addEventListener('click', () => settingsModal.classList.add('active'));
+            closeModalBtn.addEventListener('click', () => settingsModal.classList.remove('active'));
+
+            saveKeyBtn.addEventListener('click', () => {
+                const key = apiKeyInput.value.trim();
+                if (key) {
+                    localStorage.setItem('chatAnywhereApiKey', key);
+                    showToast('API Key saved successfully!');
+                    settingsModal.classList.remove('active');
+                } else {
+                    showToast('Please enter an API Key.');
+                }
+            });
+
+            btnOtc.addEventListener('click', () => {
+                isOtcMode = true;
+                modeSwitch.classList.remove('real-selected');
+                btnOtc.classList.add('active');
+                btnReal.classList.remove('active');
+                uploadTitleText.textContent = "Upload OTC Chart";
+            });
+
+            btnReal.addEventListener('click', () => {
+                isOtcMode = false;
+                modeSwitch.classList.add('real-selected');
+                btnReal.classList.add('active');
+                btnOtc.classList.remove('active');
+                uploadTitleText.textContent = "Upload Real Market Chart";
+            });
+
+            chartFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const apiKey = localStorage.getItem('chatAnywhereApiKey') || localStorage.getItem('geminiApiKey');
+                if (!apiKey) {
+                    showToast('Please set your ChatAnywhere API key in Avatar settings.');
+                    settingsModal.classList.add('active');
+                    return;
+                }
+
+                uploadArea.style.display = 'none';
+                masterResultsBox.style.display = 'none';
+                loader.style.display = 'flex';
+
+                try {
+                    // Extract Raw Unmodified Base64 File Data
+                    const base64Img = await convertToBase64(file);
+                    await runChatAnywhereAnalysis(base64Img, apiKey);
+                } catch (err) {
+                    showToast(err.message);
+                    uploadArea.style.display = 'flex';
+                } finally {
+                    loader.style.display = 'none';
+                    chartFileInput.value = '';
+                }
+            });
+
+            reanalyzeBtn.addEventListener('click', () => {
+                masterResultsBox.style.display = 'none';
+                uploadArea.style.display = 'flex';
+            });
+
+            // Reads raw binary data into pure base64 Data URL format for OpenAI Vision API
+            function convertToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async function runChatAnywhereAnalysis(base64Image, apiKey) {
+                const endpoint = "https://api.chatanywhere.tech/v1/chat/completions";
+                const activePrompt = isOtcMode ? OTC_PROMPT : REAL_PROMPT;
+
+                const body = {
+                    model: "gpt-5.6-sol",
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                { type: "text", text: activePrompt },
+                                {
+                                    type: "image_url",
+                                    image_url: {
+                                        url: base64Image
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    max_tokens: 1000
+                };
+
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (!res.ok) throw new Error('API Request Failed. Check key or limits.');
+
+                const data = await res.json();
+                try {
+                    let text = data.choices[0].message.content;
+                    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const parsed = JSON.parse(text);
+                    renderResults(parsed);
+                } catch (e) {
+                    throw new Error('Analysis response formatting error.');
+                }
+            }
+
+            function getCountryFlags(pair) {
+                if (!pair) return '';
+                const clean = pair.replace(/[^A-Za-z]/g, '').toUpperCase();
+                if (clean.length >= 6) {
+                    const c1 = clean.substring(0, 2).toLowerCase();
+                    const c2 = clean.substring(3, 5).toLowerCase();
+                    return `<span class="currency-flags">
+                        <img class="flag-img" src="https://flagcdn.com/24x18/${c1}.png" alt="flag">
+                        <img class="flag-img" src="https://flagcdn.com/24x18/${c2}.png" alt="flag">
+                    </span>`;
+                }
+                return '';
+            }
+
+            function renderResults(data) {
+                let pairText = data.pair || data.market || (isOtcMode ? 'OTC Asset' : 'Real Market');
+                
+                if (isOtcMode && !pairText.includes('(OTC)')) {
+                    pairText += ' (OTC)';
+                }
+
+                valPair.innerHTML = getCountryFlags(pairText) + pairText;
+
+                const sig = (data.direction || data.signal || 'WAIT').toUpperCase();
+                valSignal.textContent = sig;
+                valSignal.style.color = (sig === 'UP' || sig === 'BUY' || sig === 'CALL') ? 'var(--success-color)' : ((sig === 'DOWN' || sig === 'SELL' || sig === 'PUT') ? 'var(--danger-color)' : 'var(--text-main)');
+
+                valTrend.textContent = data.trend || (data.logics && data.logics[0] ? 'Analysis Based' : 'N/A');
+                
+                const confidenceVal = data.confidence || data.strength || 'N/A';
+                valConfidence.textContent = typeof confidenceVal === 'number' ? `${confidenceVal}%` : confidenceVal;
+                
+                trapLevelText.textContent = data.trap_level || (isOtcMode ? 'Medium' : (data.isOtc ? 'High (OTC Detected)' : 'Low'));
+                
+                if (data.traps && Array.isArray(data.traps) && data.traps.length > 0) {
+                    trapReasonText.textContent = data.traps.join(', ');
+                } else if (data.trap_reason) {
+                    trapReasonText.textContent = data.trap_reason;
+                } else if (data.logics && data.logics[2]) {
+                    trapReasonText.textContent = `Risk: ${data.logics[2]}`;
+                } else {
+                    trapReasonText.textContent = 'No critical traps identified.';
+                }
+
+                if (data.logic) {
+                    valLogic.textContent = data.logic;
+                } else if (data.logics && Array.isArray(data.logics)) {
+                    valLogic.textContent = data.logics.join(' | ');
+                } else {
+                    valLogic.textContent = 'Price action logic calculated based on structure.';
+                }
+
+                uploadArea.style.display = 'none';
+                masterResultsBox.style.display = 'flex';
+            }
+
+            function showToast(msg) {
+                const toast = document.getElementById('toastMsg');
+                toast.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+        });
+    </script>
+</body>
+</html>
