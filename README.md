@@ -1,0 +1,2 @@
+# marketanalyzer
+nlxsh-deploy
